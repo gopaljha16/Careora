@@ -1,0 +1,18 @@
+{
+  "name": "careora",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"bun run --cwd backend dev\" \"bun run --cwd frontend dev\"",
+    "db:migrate": "bun run --cwd packages/db migrate",
+    "db:seed": "bun run --cwd packages/db seed",
+    "db:studio": "bun run --cwd packages/db studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String        @id @default(cuid())
+  email             String        @unique
+  name              String
+  passwordHash      String
+  emailNotifications Boolean       @default(true)
+  createdAt         DateTime      @default(now())
+  jobs              Job[]
+  applications      Application[]
+}
+
+model Job {
+  id           String        @id @default(cuid())
+  userId       String
+  company      String
+  role         String
+  jobUrl       String?
+  location     String?
+  salary       String?
+  description  String?
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+}
+
+enum ApplicationStatus {
+  WISHLIST
+  APPLIED
+  PHONE_SCREEN
+  INTERVIEW
+  OFFER
+  REJECTED
+  WITHDRAWN
+}
+
+model Application {
+  id         String            @id @default(cuid())
+  jobId      String
+  userId     String
+  status     ApplicationStatus @default(WISHLIST)
+  appliedAt  DateTime?
+  updatedAt  DateTime          @updatedAt
+  source     String?           // "LinkedIn", "Indeed", "Referral", etc.
+  notes      String?           // free-text quick note
+  job        Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appNotes   ApplicationNote[]
+  interviews InterviewRound[]
+}
+
+model ApplicationNote {
+  id            String      @id @default(cuid())
+  applicationId String
+  content       String
+  createdAt     DateTime    @default(now())
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+enum RoundType {
+  PHONE
+  TECHNICAL
+  BEHAVIORAL
+  FINAL
+}
+
+model InterviewRound {
+  id            String      @id @default(cuid())
+  applicationId String
+  roundType     RoundType
+  scheduledAt   DateTime
+  outcome       String?
+  notes         String?
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}

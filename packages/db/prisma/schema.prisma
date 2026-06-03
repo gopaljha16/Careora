@@ -4,18 +4,20 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
-  id                String        @id @default(cuid())
-  email             String        @unique
-  name              String
-  passwordHash      String
+  id                 String        @id @default(cuid())
+  email              String        @unique
+  name               String
+  passwordHash       String
   emailNotifications Boolean       @default(true)
-  createdAt         DateTime      @default(now())
-  jobs              Job[]
-  applications      Application[]
+  reminderEnabled    Boolean       @default(true)
+  reminderTime       String        @default("09:00")
+  lastReminderSentAt DateTime?
+  createdAt          DateTime      @default(now())
+  jobs               Job[]
+  applications       Application[]
 }
 
 model Job {

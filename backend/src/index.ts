@@ -8,6 +8,7 @@ import applicationsRoutes from './routes/applications';
 import notesRoutes from './routes/notes';
 import interviewsRoutes from './routes/interviews';
 import statsRoutes from './routes/stats';
+import settingsRoutes from './routes/settings';
 
 import './jobs/dailyDigest';
 
@@ -23,6 +24,7 @@ app.use('/api/applications', applicationsRoutes);
 app.use('/api/applications/:applicationId/notes', notesRoutes);
 app.use('/api/applications/:applicationId/interviews', interviewsRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

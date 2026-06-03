@@ -1,5 +1,4 @@
 import { PrismaClient, ApplicationStatus, RoundType } from '@prisma/client';
-// Using bcryptjs for seed as it's purely JS based and compatible with Bun
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -7,14 +6,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
   
-  // Clear existing
   await prisma.interviewRound.deleteMany();
   await prisma.applicationNote.deleteMany();
   await prisma.application.deleteMany();
   await prisma.job.deleteMany();
   await prisma.user.deleteMany();
 
-  // Create demo user
   const passwordHash = await bcrypt.hash('Demo@1234', 10);
   const user = await prisma.user.create({
     data: {
@@ -26,7 +23,6 @@ async function main() {
 
   console.log(`Created user: ${user.email}`);
 
-  // Create 10 jobs & applications
   const sampleJobs = [
     { company: 'Google', role: 'Software Engineer', status: ApplicationStatus.OFFER },
     { company: 'Meta', role: 'Frontend Developer', status: ApplicationStatus.INTERVIEW },
@@ -43,7 +39,6 @@ async function main() {
   for (let i = 0; i < sampleJobs.length; i++) {
     const jobData = sampleJobs[i];
     
-    // Spread application across last 14 days
     const appliedDate = new Date();
     appliedDate.setDate(appliedDate.getDate() - (i % 14));
 

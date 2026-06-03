@@ -49,8 +49,8 @@ model Application {
   status     ApplicationStatus @default(WISHLIST)
   appliedAt  DateTime?
   updatedAt  DateTime          @updatedAt
-  source     String?           // "LinkedIn", "Indeed", "Referral", etc.
-  notes      String?           // free-text quick note
+  source     String?
+  notes      String?
   job        Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
   user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   appNotes   ApplicationNote[]

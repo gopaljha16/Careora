@@ -10,6 +10,7 @@ export const listApplications = async (req: Request, res: Response, next: NextFu
       where: { userId },
       include: { job: true },
       orderBy: { updatedAt: 'desc' },
+      take: 1000, // Hard cap to prevent massive payload memory exhaustion
     });
 
     res.json(applications);

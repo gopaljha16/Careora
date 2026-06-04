@@ -24,7 +24,16 @@ router.post(
 
 router.get('/:id', getApplication);
 
-router.put('/:id', updateApplication);
+router.put(
+  '/:id',
+  [
+    body('status').optional().isIn(Object.values(ApplicationStatus)).withMessage('Invalid status'),
+    body('job.company').optional().notEmpty().withMessage('Company cannot be empty'),
+    body('job.role').optional().notEmpty().withMessage('Role cannot be empty'),
+  ],
+  validateRequest,
+  updateApplication
+);
 
 router.delete('/:id', deleteApplication);
 

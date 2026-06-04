@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "next";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -18,7 +18,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -57,20 +63,32 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
-          <Link href="/" className="flex items-center gap-2 mb-6 text-primary hover:opacity-90">
+          <Link
+            href="/"
+            className="flex items-center gap-2 mb-6 text-primary hover:opacity-90"
+          >
             <Briefcase className="h-8 w-8" />
-            <span className="font-bold text-2xl tracking-tight text-slate-900">Careora</span>
+            <span className="font-bold text-2xl tracking-tight text-slate-900">
+              Careora
+            </span>
           </Link>
         </div>
 
         <Card className="shadow-lg border-0 ring-1 ring-slate-200">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold tracking-tight">Welcome back</CardTitle>
-            <CardDescription>Enter your email to sign in to your account</CardDescription>
+            <CardTitle className="text-2xl font-semibold tracking-tight">
+              Welcome back
+            </CardTitle>
+            <CardDescription>
+              Enter your email to sign in to your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Form form={form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -91,18 +109,28 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 {error && (
-                  <div className="text-sm font-medium text-destructive">{error}</div>
+                  <div className="text-sm font-medium text-destructive">
+                    {error}
+                  </div>
                 )}
-                
-                <Button type="submit" className="w-full h-11" disabled={form.formState.isSubmitting}>
+
+                <Button
+                  type="submit"
+                  className="w-full h-11"
+                  disabled={form.formState.isSubmitting}
+                >
                   {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
                 </Button>
               </form>
@@ -110,7 +138,10 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center text-sm text-slate-500">
               Don't have an account?{" "}
-              <Link href="/register" className="font-medium text-primary hover:underline">
+              <Link
+                href="/register"
+                className="font-medium text-primary hover:underline"
+              >
                 Sign up
               </Link>
             </div>

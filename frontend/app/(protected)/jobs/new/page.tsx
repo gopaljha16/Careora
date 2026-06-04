@@ -19,7 +19,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -66,9 +72,9 @@ export default function NewJobPage() {
 
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/applications`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/applications`,
         values,
-        { headers: { Authorization: `Bearer ${session.token}` } }
+        { headers: { Authorization: `Bearer ${session.token}` } },
       );
       router.push("/jobs");
       router.refresh();
@@ -81,26 +87,33 @@ export default function NewJobPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Add Application</h2>
-        <p className="text-slate-500 mt-1">Track a new job opportunity in your pipeline.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+          Add Application
+        </h2>
+        <p className="text-slate-500 mt-1">
+          Track a new job opportunity in your pipeline.
+        </p>
       </div>
 
       <Card className="border-0 shadow-sm ring-1 ring-slate-200">
         <CardHeader>
           <CardTitle>Job Details</CardTitle>
-          <CardDescription>Enter the information about the role and company.</CardDescription>
+          <CardDescription>
+            Enter the information about the role and company.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
+          <Form form={form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="company"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Company <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Acme Inc" {...field} />
                       </FormControl>
@@ -113,7 +126,9 @@ export default function NewJobPage() {
                   name="role"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Role <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Role <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Software Engineer" {...field} />
                       </FormControl>
@@ -130,7 +145,10 @@ export default function NewJobPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Initial Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a status" />
@@ -139,7 +157,9 @@ export default function NewJobPage() {
                         <SelectContent>
                           <SelectItem value="WISHLIST">Wishlist</SelectItem>
                           <SelectItem value="APPLIED">Applied</SelectItem>
-                          <SelectItem value="PHONE_SCREEN">Phone Screen</SelectItem>
+                          <SelectItem value="PHONE_SCREEN">
+                            Phone Screen
+                          </SelectItem>
                           <SelectItem value="INTERVIEW">Interview</SelectItem>
                           <SelectItem value="OFFER">Offer</SelectItem>
                           <SelectItem value="REJECTED">Rejected</SelectItem>
@@ -156,7 +176,10 @@ export default function NewJobPage() {
                     <FormItem>
                       <FormLabel>Source</FormLabel>
                       <FormControl>
-                        <Input placeholder="LinkedIn, Referral, etc." {...field} />
+                        <Input
+                          placeholder="LinkedIn, Referral, etc."
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -172,7 +195,10 @@ export default function NewJobPage() {
                     <FormItem>
                       <FormLabel>Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="Remote, New York, etc." {...field} />
+                        <Input
+                          placeholder="Remote, New York, etc."
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -200,7 +226,10 @@ export default function NewJobPage() {
                   <FormItem>
                     <FormLabel>Job URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://careers.acme.com/..." {...field} />
+                      <Input
+                        placeholder="https://careers.acme.com/..."
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -214,10 +243,10 @@ export default function NewJobPage() {
                   <FormItem>
                     <FormLabel>Initial Note</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Any initial thoughts or things to remember..." 
-                        className="resize-none" 
-                        {...field} 
+                      <Textarea
+                        placeholder="Any initial thoughts or things to remember..."
+                        className="resize-none"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -232,11 +261,17 @@ export default function NewJobPage() {
               )}
 
               <div className="flex justify-end gap-4 pt-4 border-t">
-                <Button variant="outline" type="button" onClick={() => router.back()}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => router.back()}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Creating..." : "Save Application"}
+                  {form.formState.isSubmitting
+                    ? "Creating..."
+                    : "Save Application"}
                 </Button>
               </div>
             </form>

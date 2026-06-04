@@ -32,6 +32,8 @@ model Job {
   createdAt    DateTime      @default(now())
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   applications Application[]
+
+  @@index([userId])
 }
 
 enum ApplicationStatus {
@@ -57,6 +59,10 @@ model Application {
   user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   appNotes   ApplicationNote[]
   interviews InterviewRound[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([jobId])
 }
 
 model ApplicationNote {

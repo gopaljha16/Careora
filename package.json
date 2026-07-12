@@ -7,12 +7,17 @@
     "frontend"
   ],
   "scripts": {
-    "dev": "concurrently \"bun run --cwd backend dev\" \"bun run --cwd frontend dev\"",
+    "docker:up": "docker compose up -d --wait",
+    "db:push": "bun run --cwd packages/db prisma db push",
+    "dev": "bun run docker:up && bun run db:push && concurrently \"bun run --cwd backend dev\" \"bun run --cwd frontend dev\"",
     "db:migrate": "bun run --cwd packages/db migrate",
     "db:seed": "bun run --cwd packages/db seed",
     "db:studio": "bun run --cwd packages/db studio"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0"
   }
 }

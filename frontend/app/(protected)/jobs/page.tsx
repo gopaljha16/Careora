@@ -15,7 +15,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
+  DragEndEvent,
+  useDroppable
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -46,6 +47,16 @@ const STATUS_COLORS: Record<string, string> = {
   REJECTED: "bg-red-100 text-red-700 hover:bg-red-200",
   WITHDRAWN: "bg-orange-100 text-orange-700 hover:bg-orange-200"
 };
+
+// --- Droppable Column Component ---
+function DroppableColumn({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className="min-h-[150px] h-full">
+      {children}
+    </div>
+  );
+}
 
 // --- Sortable Item Component ---
 function SortableAppCard({ app }: { app: any }) {
@@ -207,11 +218,11 @@ export default function KanbanBoardPage() {
                     items={col.apps.map(a => a.id)} 
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="min-h-[150px]">
+                    <DroppableColumn id={col.id}>
                       {col.apps.map((app) => (
                         <SortableAppCard key={app.id} app={app} />
                       ))}
-                    </div>
+                    </DroppableColumn>
                   </SortableContext>
                 </div>
               </div>

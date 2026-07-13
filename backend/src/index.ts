@@ -10,6 +10,8 @@ import notesRoutes from './routes/notes';
 import interviewsRoutes from './routes/interviews';
 import statsRoutes from './routes/stats';
 import settingsRoutes from './routes/settings';
+import referralsRoutes from './routes/referrals';
+import learningRoutes from './routes/learning';
 
 import './jobs/dailyDigest';
 
@@ -33,7 +35,9 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 
 // Restrict CORS in production
 const corsOptions = {
@@ -53,6 +57,8 @@ app.use('/api/applications/:applicationId/notes', notesRoutes);
 app.use('/api/applications/:applicationId/interviews', interviewsRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/referrals', referralsRoutes);
+app.use('/api/learning', learningRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

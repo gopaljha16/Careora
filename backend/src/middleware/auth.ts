@@ -41,3 +41,6 @@ export const authMiddleware = (
     res.status(401).json({ error: 'Unauthorized: Invalid token' });
   }
 };
+
+export const requireAuth = authMiddleware;
+

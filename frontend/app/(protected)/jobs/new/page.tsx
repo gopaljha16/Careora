@@ -44,7 +44,12 @@ const formSchema = z.object({
   status: z.string(),
   source: z.string().optional(),
   notes: z.string().optional(),
+  platform: z.string().min(1, "Platform is required"),
+  isReferral: z.boolean(),
+  referralName: z.string().optional(),
 });
+
+const PLATFORMS = ["LinkedIn", "Naukri", "Instahyre", "AngelList", "Indeed", "Direct", "Referral", "Other"];
 
 export default function NewJobPage() {
   const { data: session } = useSession();
@@ -63,6 +68,9 @@ export default function NewJobPage() {
       status: "WISHLIST",
       source: "",
       notes: "",
+      platform: "LinkedIn",
+      isReferral: false,
+      referralName: "",
     },
   });
 
@@ -87,15 +95,15 @@ export default function NewJobPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">
           Add Application
         </h2>
-        <p className="text-slate-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Track a new job opportunity in your pipeline.
         </p>
       </div>
 
-      <Card className="border-0 shadow-sm ring-1 ring-slate-200">
+      <Card className="shadow-sm border border-border">
         <CardHeader>
           <CardTitle>Job Details</CardTitle>
           <CardDescription>
@@ -112,7 +120,7 @@ export default function NewJobPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Company <span className="text-red-500">*</span>
+                        Company <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input placeholder="Acme Inc" {...field} />
@@ -127,7 +135,7 @@ export default function NewJobPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Role <span className="text-red-500">*</span>
+                        Role <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input placeholder="Software Engineer" {...field} />
@@ -174,10 +182,10 @@ export default function NewJobPage() {
                   name="source"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Source</FormLabel>
+                      <FormLabel>Source (Optional)</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="LinkedIn, Referral, etc."
+                          placeholder="Link to post, event, etc."
                           {...field}
                         />
                       </FormControl>
@@ -186,6 +194,76 @@ export default function NewJobPage() {
                   )}
                 />
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="platform"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Platform <span className="text-destructive">*</span></FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select platform" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {PLATFORMS.map(p => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="isReferral"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-3 bg-muted/20 shadow-sm mt-8">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Referral Application</FormLabel>
+                          <FormDescription>Did someone refer you?</FormDescription>
+                        </div>
+                        <FormControl>
+                          <input 
+                            type="checkbox" 
+                            className="h-5 w-5 accent-primary rounded cursor-pointer"
+                            checked={field.value} 
+                            onChange={field.onChange} 
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {form.watch("isReferral") && (
+                <FormField
+                  control={form.control}
+                  name="referralName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Referrer Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="John Doe from Engineering"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
@@ -260,7 +338,7 @@ export default function NewJobPage() {
                 </div>
               )}
 
-              <div className="flex justify-end gap-4 pt-4 border-t">
+              <div className="flex justify-end gap-4 pt-4 border-t border-border">
                 <Button
                   variant="outline"
                   type="button"

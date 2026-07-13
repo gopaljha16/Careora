@@ -86,7 +86,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 text-foreground">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <Link
@@ -94,13 +94,13 @@ export default function RegisterPage() {
             className="flex items-center gap-2 mb-6 text-primary hover:opacity-90"
           >
             <Briefcase className="h-8 w-8" />
-            <span className="font-bold text-2xl tracking-tight text-slate-900">
+            <span className="font-bold text-2xl tracking-tight text-foreground">
               Careora
             </span>
           </Link>
         </div>
 
-        <Card className="shadow-lg border-0 ring-1 ring-slate-200">
+        <Card className="shadow-lg border border-border">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-semibold tracking-tight">
               Create an account
@@ -177,7 +177,7 @@ export default function RegisterPage() {
               </form>
             </Form>
 
-            <div className="mt-6 text-center text-sm text-slate-500">
+            <div className="mt-6 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 href="/login"

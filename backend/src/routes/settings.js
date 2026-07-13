@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const express_validator_1 = require("express-validator");
+const auth_1 = require("../middleware/auth");
+const validation_1 = require("../middleware/validation");
+const settingsController_1 = require("../controllers/settingsController");
+const router = (0, express_1.Router)();
+router.use(auth_1.authMiddleware);
+router.get('/reminder', settingsController_1.getReminderSettings);
+router.put('/reminder', [(0, express_validator_1.body)('reminderTime').optional().matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('reminderTime must be in HH:mm format')], validation_1.validateRequest, settingsController_1.updateReminderSettings);
+exports.default = router;

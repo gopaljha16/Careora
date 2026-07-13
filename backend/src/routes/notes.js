@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const express_validator_1 = require("express-validator");
+const auth_1 = require("../middleware/auth");
+const validation_1 = require("../middleware/validation");
+const helpers_1 = require("../controllers/helpers");
+const notesController_1 = require("../controllers/notesController");
+const router = (0, express_1.Router)({ mergeParams: true });
+router.use(auth_1.authMiddleware);
+router.get('/', helpers_1.verifyApplicationOwnership, notesController_1.listNotes);
+router.post('/', helpers_1.verifyApplicationOwnership, [(0, express_validator_1.body)('content').notEmpty().withMessage('Content is required')], validation_1.validateRequest, notesController_1.createNote);
+exports.default = router;

@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "bun --env-file=..\\.env run next dev",
     "build": "bun --env-file=..\\.env run next build",

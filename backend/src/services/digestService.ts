@@ -1,7 +1,7 @@
-import { PrismaClient, ApplicationStatus } from '@prisma/client';
+import { ApplicationStatus } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 import { sendMail } from './mailer';
 
-const prisma = new PrismaClient();
 
 const formatReminderText = (userName: string, todayCount: number, totalActive: number, interviewCount: number, offerCount: number, now: Date): string => `Hi ${userName},
 

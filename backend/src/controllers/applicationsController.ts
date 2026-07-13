@@ -22,7 +22,7 @@ export const listApplications = async (req: Request, res: Response, next: NextFu
 export const createApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { company, role, jobUrl, location, salary, description, status, source, notes } = req.body;
+    const { company, role, jobUrl, location, salary, description, status, source, notes, platform, isReferral, referralName } = req.body;
 
     const job = await prisma.job.create({
       data: {
@@ -39,6 +39,9 @@ export const createApplication = async (req: Request, res: Response, next: NextF
             status,
             source,
             notes,
+            platform,
+            isReferral,
+            referralName,
             appliedAt: status !== ApplicationStatus.WISHLIST ? new Date() : null,
           },
         },
@@ -75,7 +78,7 @@ export const getApplication = async (req: Request, res: Response, next: NextFunc
 export const updateApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { status, source, notes, job } = req.body;
+    const { status, source, notes, job, platform, isReferral, referralName } = req.body;
 
     const existingApp = await prisma.application.findFirst({
       where: { id: req.params.id, userId },
@@ -106,6 +109,9 @@ export const updateApplication = async (req: Request, res: Response, next: NextF
         status,
         source,
         notes,
+        platform,
+        isReferral: isReferral !== undefined ? isReferral : existingApp.isReferral,
+        referralName: referralName !== undefined ? referralName : existingApp.referralName,
         ...(status && status !== ApplicationStatus.WISHLIST && !existingApp.appliedAt ? { appliedAt: new Date() } : {}),
       },
       include: { job: true },

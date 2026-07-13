@@ -10,6 +10,8 @@ export const getStats = async (req: Request, res: Response, next: NextFunction):
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
 
     const totalApplications = await prisma.application.count({ where: { userId } });
     const todayApplications = await prisma.application.count({
@@ -60,6 +62,43 @@ export const getStats = async (req: Request, res: Response, next: NextFunction):
 
     const applicationsPerDay = Object.entries(dailyMap).map(([date, count]) => ({ date, count }));
 
+    // Heatmap (365 days)
+    const yearApps = await prisma.application.findMany({
+      where: { userId, appliedAt: { gte: yearAgo } },
+      select: { appliedAt: true },
+    });
+    
+    const heatmapMap: Record<string, number> = {};
+    yearApps.forEach((app) => {
+      if (app.appliedAt) {
+        const dateKey = app.appliedAt.toISOString().split('T')[0];
+        heatmapMap[dateKey] = (heatmapMap[dateKey] || 0) + 1;
+      }
+    });
+    const heatmapData = Object.entries(heatmapMap).map(([date, count]) => ({ date, count }));
+
+    // Platform breakdown (last 30 days)
+    const platformGroups = await prisma.application.groupBy({
+      by: ['platform'],
+      where: { userId, appliedAt: { gte: thirtyDaysAgo }, platform: { not: null } },
+      _count: { id: true },
+    });
+    const platformBreakdown = platformGroups.map(p => ({ platform: p.platform, count: p._count.id }));
+
+    // Referral stats
+    const totalRecentApps = await prisma.application.count({
+      where: { userId, appliedAt: { gte: thirtyDaysAgo } }
+    });
+    const referralAppsCount = await prisma.application.count({
+      where: { userId, appliedAt: { gte: thirtyDaysAgo }, isReferral: true }
+    });
+    const referralStats = {
+      total: totalRecentApps,
+      referrals: referralAppsCount,
+      direct: totalRecentApps - referralAppsCount,
+      percentage: totalRecentApps > 0 ? Math.round((referralAppsCount / totalRecentApps) * 100) : 0
+    };
+
     res.json({
       totalApplications,
       todayApplications,
@@ -67,6 +106,9 @@ export const getStats = async (req: Request, res: Response, next: NextFunction):
       activePipeline,
       byStatus,
       applicationsPerDay,
+      heatmapData,
+      platformBreakdown,
+      referralStats,
     });
   } catch (error) {
     next(error);

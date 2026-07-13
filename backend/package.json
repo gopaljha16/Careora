@@ -6,7 +6,8 @@
     "dev": "bun --env-file=../.env run --watch src/index.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.3",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "7.8.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "db": "workspace:*",
@@ -16,7 +17,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.3",
-    "nodemailer": "^6.10.0"
+    "nodemailer": "^6.10.0",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

@@ -39,13 +39,13 @@ const STATUSES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  WISHLIST: "bg-slate-100 text-slate-700 hover:bg-slate-200",
-  APPLIED: "bg-blue-100 text-blue-700 hover:bg-blue-200",
-  PHONE_SCREEN: "bg-purple-100 text-purple-700 hover:bg-purple-200",
-  INTERVIEW: "bg-amber-100 text-amber-700 hover:bg-amber-200",
-  OFFER: "bg-green-100 text-green-700 hover:bg-green-200",
-  REJECTED: "bg-red-100 text-red-700 hover:bg-red-200",
-  WITHDRAWN: "bg-orange-100 text-orange-700 hover:bg-orange-200"
+  WISHLIST: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700",
+  APPLIED: "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60",
+  PHONE_SCREEN: "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/60",
+  INTERVIEW: "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60",
+  OFFER: "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/60",
+  REJECTED: "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60",
+  WITHDRAWN: "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/60"
 };
 
 // --- Droppable Column Component ---
@@ -81,16 +81,24 @@ function SortableAppCard({ app }: { app: any }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-3 cursor-grab active:cursor-grabbing hover:border-primary/50 transition-colors"
+      className="bg-card p-4 rounded-lg shadow-sm border border-border mb-3 cursor-grab active:cursor-grabbing hover:border-primary/50 transition-colors"
     >
       <div className="flex justify-between items-start mb-2">
-        <h4 className="font-semibold text-slate-900 line-clamp-1">{app.job.company}</h4>
+        <h4 className="font-semibold text-foreground line-clamp-1 flex items-center gap-1.5">
+          {app.job.company}
+          {app.isReferral && <span title="Referred Application">🤝</span>}
+        </h4>
         <Badge variant="secondary" className={`text-xs ml-2 ${STATUS_COLORS[app.status]}`}>
           {app.status.replace("_", " ")}
         </Badge>
       </div>
-      <p className="text-sm text-slate-600 line-clamp-1 mb-3">{app.job.role}</p>
-      <div className="flex items-center justify-between text-xs text-slate-400 mt-2 pt-3 border-t border-slate-100">
+      <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{app.job.role}</p>
+      {app.platform && (
+        <div className="mb-2">
+          <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted">{app.platform}</Badge>
+        </div>
+      )}
+      <div className="flex items-center justify-between text-xs text-muted-foreground/60 mt-2 pt-3 border-t border-border">
         <span>{app.appliedAt ? formatDistanceToNow(new Date(app.appliedAt), { addSuffix: true }) : "Not applied"}</span>
         <Link 
           href={`/jobs/${app.id}`} 
@@ -183,15 +191,15 @@ export default function KanbanBoardPage() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-slate-500">Loading pipeline...</div>;
+    return <div className="flex items-center justify-center h-64 text-muted-foreground">Loading pipeline...</div>;
   }
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Pipeline</h2>
-          <p className="text-slate-500 mt-1">Drag and drop applications to update their status.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">Pipeline</h2>
+          <p className="text-muted-foreground mt-1">Drag and drop applications to update their status.</p>
         </div>
         <Link href="/jobs/new">
           <Button className="gap-2">
@@ -204,10 +212,10 @@ export default function KanbanBoardPage() {
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <div className="flex gap-6 h-full items-start min-w-max">
             {columns.map((col) => (
-              <div key={col.id} className="w-80 flex flex-col bg-slate-100 rounded-xl max-h-full">
-                <div className="p-4 flex items-center justify-between border-b border-slate-200">
-                  <h3 className="font-semibold text-sm text-slate-700 capitalize">{col.title.toLowerCase()}</h3>
-                  <span className="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">
+              <div key={col.id} className="w-80 flex flex-col bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/40 rounded-xl max-h-full">
+                <div className="p-4 flex items-center justify-between border-b border-border">
+                  <h3 className="font-semibold text-sm text-foreground/80 capitalize">{col.title.toLowerCase()}</h3>
+                  <span className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs py-0.5 px-2 rounded-full font-medium">
                     {col.apps.length}
                   </span>
                 </div>

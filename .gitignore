@@ -24,3 +24,8 @@ packages/db/prisma/sqlite.db
 # OS
 .DS_Store
 Thumbs.db
+
+# Backend — never commit tsc-compiled JS into src/ (Bun runs .ts directly)
+# If tsc is run, compiled output goes to backend/dist/ via tsconfig outDir
+backend/src/**/*.js
+backend/src/**/*.js.map

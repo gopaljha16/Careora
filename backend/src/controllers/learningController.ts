@@ -22,14 +22,10 @@ export const getTodayLearningEntry = async (req: Request, res: Response, next: N
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const entry = await prisma.learningEntry.findUnique({
-      where: {
-        userId_date: {
-          userId,
-          date: today,
-        },
-      },
+      where: { userId_date: { userId, date: today } },
     });
-    res.json(entry || null);
+    // Return {} (not null) so the frontend can safely check .content / .missed
+    res.json(entry ?? {});
   } catch (error) {
     next(error);
   }
@@ -42,14 +38,9 @@ export const getYesterdayLearningEntry = async (req: Request, res: Response, nex
     const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
 
     const entry = await prisma.learningEntry.findUnique({
-      where: {
-        userId_date: {
-          userId,
-          date: yesterday,
-        },
-      },
+      where: { userId_date: { userId, date: yesterday } },
     });
-    res.json(entry || null);
+    res.json(entry ?? {});
   } catch (error) {
     next(error);
   }
@@ -59,24 +50,18 @@ export const upsertLearningEntry = async (req: Request, res: Response, next: Nex
   try {
     const userId = req.user!.id;
     const { content, missed, date } = req.body;
-    
-    const dateObj = date ? new Date(date) : new Date();
+
+    // content is non-nullable in the schema — default to empty string if omitted
+    const safeContent = (content ?? '').toString().trim();
+    const safeMissed  = (missed  ?? '').toString().trim();
+
+    const dateObj  = date ? new Date(date) : new Date();
     const targetDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
 
     const entry = await prisma.learningEntry.upsert({
-      where: {
-        userId_date: {
-          userId,
-          date: targetDate,
-        },
-      },
-      update: { content, missed },
-      create: {
-        userId,
-        date: targetDate,
-        content,
-        missed,
-      },
+      where: { userId_date: { userId, date: targetDate } },
+      update: { content: safeContent, missed: safeMissed },
+      create: { userId, date: targetDate, content: safeContent, missed: safeMissed },
     });
     res.json(entry);
   } catch (error) {

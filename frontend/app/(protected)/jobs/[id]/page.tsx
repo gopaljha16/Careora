@@ -346,9 +346,7 @@ export default function JobDetailPage() {
               </div>
               
               <Dialog open={isInterviewDialogOpen} onOpenChange={setIsInterviewDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">Add Round</Button>
-                </DialogTrigger>
+                <DialogTrigger render={<Button variant="outline" size="sm">Add Round</Button>} />
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Add Interview Round</DialogTitle>
@@ -357,7 +355,7 @@ export default function JobDetailPage() {
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
                       <Label>Round Type</Label>
-                      <Select value={interviewType} onValueChange={setInterviewType}>
+                      <Select value={interviewType} onValueChange={(val) => setInterviewType(val || "PHONE")}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>

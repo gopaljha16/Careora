@@ -209,7 +209,7 @@ export default function DashboardPage() {
           >
             <Flame className="h-3.5 w-3.5 text-orange-500" />
             <span className="text-xs font-semibold text-orange-600 dark:text-orange-400">
-              {stats.currentStreak} day streak
+              {stats?.currentStreak} day streak
             </span>
           </motion.div>
         )}

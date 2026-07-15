@@ -29,10 +29,10 @@ export function Heatmap({ data, days = 365 }: HeatmapProps) {
 
   const getColor = (count: number) => {
     if (count === 0) return "bg-slate-100 dark:bg-slate-800";
-    if (count === 1) return "bg-emerald-200 dark:bg-emerald-900/40";
-    if (count === 2) return "bg-emerald-400 dark:bg-emerald-700/60";
-    if (count <= 4) return "bg-emerald-600 dark:bg-emerald-500/80";
-    return "bg-emerald-800 dark:bg-emerald-400";
+    if (count === 1) return "bg-orange-200 dark:bg-orange-900/40";
+    if (count === 2) return "bg-orange-400 dark:bg-orange-700/60";
+    if (count <= 4) return "bg-orange-500 dark:bg-orange-500/80";
+    return "bg-orange-700 dark:bg-orange-400";
   };
 
   // Group into columns of 7 days (weeks)
@@ -89,10 +89,10 @@ export function Heatmap({ data, days = 365 }: HeatmapProps) {
       <div className="flex justify-end items-center gap-2 text-xs text-slate-500 mt-2 px-2">
         <span>Less</span>
         <div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-400 dark:bg-emerald-700/60" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-600 dark:bg-emerald-500/80" />
-        <div className="w-3 h-3 rounded-sm bg-emerald-800 dark:bg-emerald-400" />
+        <div className="w-3 h-3 rounded-sm bg-orange-200 dark:bg-orange-900/40" />
+        <div className="w-3 h-3 rounded-sm bg-orange-400 dark:bg-orange-700/60" />
+        <div className="w-3 h-3 rounded-sm bg-orange-500 dark:bg-orange-500/80" />
+        <div className="w-3 h-3 rounded-sm bg-orange-700 dark:bg-orange-400" />
         <span>More</span>
       </div>
     </div>

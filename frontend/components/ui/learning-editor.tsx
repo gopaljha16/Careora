@@ -3,9 +3,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { BookOpen, AlertCircle, CheckCircle2 } from "lucide-react";
+import { BookOpen, AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
 export function LearningEditor() {
@@ -29,12 +28,12 @@ export function LearningEditor() {
             headers: { Authorization: `Bearer ${session.token}` }
           })
         ]);
-        
+
         if (todayRes.data) {
           setContent(todayRes.data.content || "");
           setMissed(todayRes.data.missed || "");
         }
-        
+
         if (yesterdayRes.data && yesterdayRes.data.missed) {
           setYesterdayMissed(yesterdayRes.data.missed);
         }
@@ -68,7 +67,6 @@ export function LearningEditor() {
   // Debounced save
   useEffect(() => {
     if (isInitialLoad) return;
-    
     const timer = setTimeout(() => {
       saveEntry();
     }, 2000);
@@ -77,61 +75,86 @@ export function LearningEditor() {
   }, [content, missed, isInitialLoad]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* Yesterday's missed review */}
       {yesterdayMissed && (
-        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-md shadow-sm">
-          <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0" />
+        <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/30 rounded-xl p-3.5">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-semibold text-amber-800">Review from Yesterday</h4>
-              <p className="text-sm text-amber-700 mt-1 whitespace-pre-wrap">{yesterdayMissed}</p>
+              <h4 className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1">
+                Review from Yesterday
+              </h4>
+              <p className="text-xs text-amber-700 dark:text-amber-400/80 whitespace-pre-wrap leading-relaxed">
+                {yesterdayMissed}
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      <Card className="border-0 shadow-sm ring-1 ring-slate-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-500" />
-            Today&apos;s Learning Journal
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* Learning Card */}
+      <div className="rounded-2xl border border-slate-200/60 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm shadow-md overflow-hidden">
+        {/* Header */}
+        <div className="px-4 pt-4 pb-3 border-b border-slate-100 dark:border-slate-800/60">
+          <div className="flex items-center gap-2">
+            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-sm">
+              <BookOpen className="h-3.5 w-3.5 text-white" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Today&apos;s Learning</h3>
+            <Sparkles className="h-3.5 w-3.5 text-amber-400 ml-auto" />
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 space-y-3">
           <div>
-            <label className="text-sm font-medium text-slate-700 mb-1.5 block">What did you learn today?</label>
-            <Textarea 
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wider">
+              What did you learn today?
+            </label>
+            <Textarea
               placeholder="e.g. Mastered Next.js App Router, read about System Design..."
-              className="min-h-[120px] resize-y"
+              className="min-h-[90px] resize-y text-sm bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/60 rounded-xl focus:ring-orange-400/30 focus:border-orange-400/60"
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-slate-700 mb-1.5 block">What did you miss / need to review tomorrow?</label>
-            <Textarea 
-              placeholder="e.g. Need to revise React Hooks, missed the DP problem..."
-              className="min-h-[80px] resize-y"
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wider">
+              Need to review tomorrow?
+            </label>
+            <Textarea
+              placeholder="e.g. Revise React Hooks, finish the DP problem..."
+              className="min-h-[60px] resize-y text-sm bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/60 rounded-xl focus:ring-orange-400/30 focus:border-orange-400/60"
               value={missed}
               onChange={(e) => setMissed(e.target.value)}
             />
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-between border-t pt-4">
-          <div className="text-xs text-slate-500 flex items-center min-h-[20px]">
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 pb-4 flex items-center justify-between gap-3">
+          <div className="text-[11px] text-slate-400 flex items-center min-h-[20px]">
             {saving ? (
-              <span className="animate-pulse">Saving...</span>
+              <span className="animate-pulse text-orange-400">Saving...</span>
             ) : saved ? (
-              <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Saved</span>
+              <span className="text-emerald-500 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Saved!
+              </span>
             ) : (
               "Auto-saves as you type"
             )}
           </div>
-          <Button onClick={saveEntry} disabled={saving} size="sm">
+          <Button
+            onClick={saveEntry}
+            disabled={saving}
+            size="sm"
+            className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white shadow-md shadow-orange-500/20 rounded-xl font-semibold text-xs px-4 transition-all hover:scale-[1.02]"
+          >
             Save Now
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

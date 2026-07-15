@@ -5,9 +5,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { Plus } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   DndContext,
   closestCenter,
@@ -117,6 +118,8 @@ export default function KanbanBoardPage() {
   const { data: session } = useSession();
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -141,11 +144,20 @@ export default function KanbanBoardPage() {
     fetchApps();
   }, [session?.token]);
 
-  // Group applications by status
+  // Filter applications
+  const filteredApplications = applications.filter((app) => {
+    const matchesSearch = 
+      app.job.company.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      app.job.role.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "ALL" || app.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // Group filtered applications by status
   const columns = STATUSES.map(status => ({
     id: status,
     title: status.replace("_", " "),
-    apps: applications.filter(a => a.status === status)
+    apps: filteredApplications.filter(a => a.status === status)
   }));
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -171,6 +183,9 @@ export default function KanbanBoardPage() {
     }
 
     if (activeApp.status !== newStatus) {
+      // Save previous state for rollback
+      const previousApplications = [...applications];
+
       // Optimistic update
       setApplications(prev => prev.map(a => 
         a.id === appId ? { ...a, status: newStatus } : a
@@ -185,7 +200,8 @@ export default function KanbanBoardPage() {
         );
       } catch (error) {
         console.error("Failed to update status", error);
-        // Revert on failure (simplified - ideally fetch fresh data)
+        // Rollback on failure
+        setApplications(previousApplications);
       }
     }
   }
@@ -196,16 +212,37 @@ export default function KanbanBoardPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-foreground">Pipeline</h2>
           <p className="text-muted-foreground mt-1">Drag and drop applications to update their status.</p>
         </div>
-        <Link href="/jobs/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" /> Add Application
-          </Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search company or role..."
+              className="pl-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1 h-7 w-7"
+                onClick={() => setSearchQuery("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <Link href="/jobs/new" className="w-full sm:w-auto">
+            <Button className="gap-2 w-full">
+              <Plus className="h-4 w-4" /> Add Application
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="flex-1 overflow-x-auto pb-4">

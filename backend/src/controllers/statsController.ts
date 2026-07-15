@@ -13,6 +13,12 @@ export const getStats = async (req: Request, res: Response, next: NextFunction):
     const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
     const yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { dailyGoal: true }
+    });
+    const dailyGoal = user?.dailyGoal || 5;
+
     const totalApplications = await prisma.application.count({ where: { userId } });
     const todayApplications = await prisma.application.count({
       where: { userId, appliedAt: { gte: today } },
@@ -109,6 +115,7 @@ export const getStats = async (req: Request, res: Response, next: NextFunction):
       heatmapData,
       platformBreakdown,
       referralStats,
+      dailyGoal,
     });
   } catch (error) {
     next(error);

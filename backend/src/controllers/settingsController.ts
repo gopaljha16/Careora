@@ -7,7 +7,7 @@ export const getReminderSettings = async (req: Request, res: Response, next: Nex
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
-      select: { reminderEnabled: true, reminderTime: true, emailNotifications: true },
+      select: { reminderEnabled: true, reminderTime: true, emailNotifications: true, dailyGoal: true },
     });
 
     if (!user) {
@@ -19,6 +19,7 @@ export const getReminderSettings = async (req: Request, res: Response, next: Nex
       reminderEnabled: user.reminderEnabled,
       reminderTime: user.reminderTime,
       emailNotifications: user.emailNotifications,
+      dailyGoal: user.dailyGoal,
     });
   } catch (error) {
     next(error);
@@ -27,7 +28,7 @@ export const getReminderSettings = async (req: Request, res: Response, next: Nex
 
 export const updateReminderSettings = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { reminderEnabled, reminderTime, emailNotifications } = req.body;
+    const { reminderEnabled, reminderTime, emailNotifications, dailyGoal } = req.body;
 
     if (reminderTime !== undefined && typeof reminderTime !== 'string') {
       res.status(400).json({ error: 'reminderTime must be a string in HH:mm format' });
@@ -45,8 +46,9 @@ export const updateReminderSettings = async (req: Request, res: Response, next: 
         ...(typeof reminderEnabled === 'boolean' ? { reminderEnabled } : {}),
         ...(reminderTime ? { reminderTime } : {}),
         ...(typeof emailNotifications === 'boolean' ? { emailNotifications } : {}),
+        ...(typeof dailyGoal === 'number' ? { dailyGoal } : {}),
       },
-      select: { reminderEnabled: true, reminderTime: true, emailNotifications: true },
+      select: { reminderEnabled: true, reminderTime: true, emailNotifications: true, dailyGoal: true },
     });
 
     res.json(updatedUser);

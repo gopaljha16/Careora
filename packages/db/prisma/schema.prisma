@@ -15,6 +15,7 @@ model User {
   emailNotifications Boolean       @default(true)
   reminderEnabled    Boolean       @default(true)
   reminderTime       String        @default("09:00")
+  dailyGoal          Int           @default(5)
   lastReminderSentAt DateTime?
   createdAt          DateTime      @default(now())
   jobs               Job[]
@@ -61,6 +62,8 @@ model Application {
   platform     String?
   isReferral   Boolean           @default(false)
   referralName String?
+  resumeVersion    String?
+  coverLetterNotes String?
   job          Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
   user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   appNotes   ApplicationNote[]

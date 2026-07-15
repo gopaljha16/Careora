@@ -20,6 +20,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const STATUS_COLORS: Record<string, string> = {
   WISHLIST: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
@@ -41,6 +58,20 @@ export default function JobDetailPage() {
   const [newNote, setNewNote] = useState("");
   const [submittingNote, setSubmittingNote] = useState(false);
 
+  // Resume Tracker State
+  const [isEditingResume, setIsEditingResume] = useState(false);
+  const [resumeVersion, setResumeVersion] = useState("");
+  const [coverLetterNotes, setCoverLetterNotes] = useState("");
+  const [savingResume, setSavingResume] = useState(false);
+
+  // Interview Dialog State
+  const [isInterviewDialogOpen, setIsInterviewDialogOpen] = useState(false);
+  const [interviewType, setInterviewType] = useState("PHONE");
+  const [interviewDate, setInterviewDate] = useState("");
+  const [interviewTime, setInterviewTime] = useState("");
+  const [interviewNotes, setInterviewNotes] = useState("");
+  const [savingInterview, setSavingInterview] = useState(false);
+
   useEffect(() => {
     async function fetchDetail() {
       if (!session?.token) return;
@@ -50,6 +81,8 @@ export default function JobDetailPage() {
           { headers: { Authorization: `Bearer ${session.token}` } }
         );
         setApp(res.data);
+        setResumeVersion(res.data.resumeVersion || "");
+        setCoverLetterNotes(res.data.coverLetterNotes || "");
       } catch (error) {
         console.error("Failed to fetch app details", error);
         router.push("/jobs");
@@ -80,6 +113,58 @@ export default function JobDetailPage() {
       console.error(e);
     } finally {
       setSubmittingNote(false);
+    }
+  }
+
+  async function handleSaveResume() {
+    if (!session?.token) return;
+    setSavingResume(true);
+    try {
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/applications/${id}`,
+        { resumeVersion, coverLetterNotes },
+        { headers: { Authorization: `Bearer ${session.token}` } }
+      );
+      setApp((prev: any) => ({
+        ...prev,
+        resumeVersion: res.data.resumeVersion,
+        coverLetterNotes: res.data.coverLetterNotes
+      }));
+      setIsEditingResume(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSavingResume(false);
+    }
+  }
+
+  async function handleAddInterview() {
+    if (!session?.token || !interviewDate || !interviewTime) return;
+    setSavingInterview(true);
+    try {
+      // Create proper datetime string
+      const scheduledAt = new Date(`${interviewDate}T${interviewTime}`).toISOString();
+      
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/applications/${id}/interviews`,
+        { roundType: interviewType, scheduledAt, notes: interviewNotes },
+        { headers: { Authorization: `Bearer ${session.token}` } }
+      );
+      
+      setApp((prev: any) => ({
+        ...prev,
+        interviews: [...(prev.interviews || []), res.data].sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+      }));
+      
+      setIsInterviewDialogOpen(false);
+      setInterviewDate("");
+      setInterviewTime("");
+      setInterviewNotes("");
+      setInterviewType("PHONE");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSavingInterview(false);
     }
   }
 
@@ -155,6 +240,57 @@ export default function JobDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Resume & Cover Letter Tracker */}
+          <Card className="shadow-sm border border-border">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Application Materials</CardTitle>
+              {!isEditingResume && (
+                <Button variant="ghost" size="sm" onClick={() => setIsEditingResume(true)}>Edit</Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {isEditingResume ? (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="resumeVersion" className="text-xs">Resume Version</Label>
+                    <Input 
+                      id="resumeVersion" 
+                      placeholder="e.g. Frontend v2" 
+                      value={resumeVersion}
+                      onChange={(e) => setResumeVersion(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="coverLetterNotes" className="text-xs">Cover Letter Key Points</Label>
+                    <Textarea 
+                      id="coverLetterNotes" 
+                      placeholder="Emphasized Next.js experience..." 
+                      value={coverLetterNotes}
+                      onChange={(e) => setCoverLetterNotes(e.target.value)}
+                      className="mt-1 resize-none h-20"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <Button variant="outline" size="sm" onClick={() => setIsEditingResume(false)}>Cancel</Button>
+                    <Button size="sm" onClick={handleSaveResume} disabled={savingResume}>Save</Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Resume Version</div>
+                    <div className="text-sm font-medium text-foreground">{app.resumeVersion || "Not specified"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Cover Letter Notes</div>
+                    <div className="text-sm text-foreground whitespace-pre-wrap">{app.coverLetterNotes || "None"}</div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column - Notes & Interviews */}
@@ -208,7 +344,58 @@ export default function JobDetailPage() {
                 </CardTitle>
                 <CardDescription>Track your interview rounds.</CardDescription>
               </div>
-              <Button variant="outline" size="sm">Add Round</Button>
+              
+              <Dialog open={isInterviewDialogOpen} onOpenChange={setIsInterviewDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">Add Round</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Interview Round</DialogTitle>
+                    <DialogDescription>Schedule a new interview round for this application.</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label>Round Type</Label>
+                      <Select value={interviewType} onValueChange={setInterviewType}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PHONE">Phone Screen</SelectItem>
+                          <SelectItem value="TECHNICAL">Technical Round</SelectItem>
+                          <SelectItem value="BEHAVIORAL">Behavioral</SelectItem>
+                          <SelectItem value="FINAL">Final Round</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Date</Label>
+                        <Input type="date" value={interviewDate} onChange={e => setInterviewDate(e.target.value)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Time</Label>
+                        <Input type="time" value={interviewTime} onChange={e => setInterviewTime(e.target.value)} />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Prep Notes (Optional)</Label>
+                      <Textarea 
+                        placeholder="Topics to study, interviewer name..." 
+                        value={interviewNotes}
+                        onChange={e => setInterviewNotes(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <Button variant="outline" onClick={() => setIsInterviewDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleAddInterview} disabled={savingInterview || !interviewDate || !interviewTime}>
+                      {savingInterview ? "Saving..." : "Add Interview"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               {app.interviews && app.interviews.length > 0 ? (

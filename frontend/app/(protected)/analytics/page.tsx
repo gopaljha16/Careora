@@ -9,7 +9,7 @@ import { ReferralLogger } from "@/components/ui/referral-logger";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Briefcase, Activity, CheckCircle, Users } from "lucide-react";
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6'];
+const COLORS = ['var(--primary)', 'var(--ring)', 'var(--destructive)', 'var(--secondary)', '#8b5cf6', '#3b82f6'];
 
 export default function AnalyticsPage() {
   const { data: session } = useSession();
@@ -86,10 +86,10 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-indigo-100 dark:border-indigo-900/50 shadow-sm bg-gradient-to-br from-indigo-50/30 to-transparent dark:from-indigo-950/20 dark:to-transparent">
+        <Card className="border border-indigo-100 dark:border-indigo-900/50 shadow-sm bg-gradient-to-br from-indigo-50/30 to-transparent dark:from-indigo-950/30 dark:to-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Referral Rate (30d)</CardTitle>
-            <Users className="h-4 w-4 text-indigo-500" />
+            <Users className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-indigo-700 dark:text-indigo-400">{stats?.referralStats?.percentage || 0}%</div>

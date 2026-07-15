@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Briefcase,
   LayoutDashboard,
@@ -13,7 +13,7 @@ import {
   BarChart2,
   BookOpen
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
@@ -33,7 +33,48 @@ export default function ProtectedLayout({
 }) {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts if user is typing in an input or textarea
+      if (
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+      // Check for command/ctrl key
+      if (e.metaKey || e.ctrlKey) {
+        switch (e.key.toLowerCase()) {
+          case 'd':
+            e.preventDefault();
+            router.push('/dashboard');
+            break;
+          case 'j':
+            e.preventDefault();
+            router.push('/jobs');
+            break;
+          case 'l':
+            e.preventDefault();
+            router.push('/learn');
+            break;
+        }
+      } else {
+        // Quick add shortcut (without modifier, just 'n' if not typing)
+        if (e.key.toLowerCase() === 'n') {
+          e.preventDefault();
+          router.push('/jobs/new');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [router]);
 
   const initials = session?.user?.name
     ? session.user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
@@ -80,16 +121,21 @@ export default function ProtectedLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium group ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium group ${
                   isActive
                     ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
-                <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-orange-500 transition-colors"}`} />
-                {item.label}
+                <div className="flex items-center gap-3">
+                  <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-orange-500 transition-colors"}`} />
+                  {item.label}
+                </div>
+                {!isActive && item.label === "Dashboard" && <span className="hidden group-hover:block text-[10px] text-slate-400 bg-slate-200/50 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono border border-slate-300 dark:border-slate-700">⌘D</span>}
+                {!isActive && item.label === "Job Pipeline" && <span className="hidden group-hover:block text-[10px] text-slate-400 bg-slate-200/50 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono border border-slate-300 dark:border-slate-700">⌘J</span>}
+                {!isActive && item.label === "Learning Journal" && <span className="hidden group-hover:block text-[10px] text-slate-400 bg-slate-200/50 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono border border-slate-300 dark:border-slate-700">⌘L</span>}
                 {isActive && (
-                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white/60" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
                 )}
               </Link>
             );

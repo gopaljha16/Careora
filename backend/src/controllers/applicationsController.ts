@@ -22,7 +22,7 @@ export const listApplications = async (req: Request, res: Response, next: NextFu
 export const createApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { company, role, jobUrl, location, salary, description, status, source, notes, platform, isReferral, referralName } = req.body;
+    const { company, role, jobUrl, location, salary, description, status, source, notes, platform, isReferral, referralName, resumeVersion, coverLetterNotes } = req.body;
 
     const job = await prisma.job.create({
       data: {
@@ -42,6 +42,8 @@ export const createApplication = async (req: Request, res: Response, next: NextF
             platform,
             isReferral,
             referralName,
+            resumeVersion,
+            coverLetterNotes,
             appliedAt: status !== ApplicationStatus.WISHLIST ? new Date() : null,
           },
         },
@@ -78,7 +80,7 @@ export const getApplication = async (req: Request, res: Response, next: NextFunc
 export const updateApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { status, source, notes, job, platform, isReferral, referralName } = req.body;
+    const { status, source, notes, job, platform, isReferral, referralName, resumeVersion, coverLetterNotes } = req.body;
 
     const existingApp = await prisma.application.findFirst({
       where: { id: req.params.id, userId },
@@ -112,6 +114,8 @@ export const updateApplication = async (req: Request, res: Response, next: NextF
         platform,
         isReferral: isReferral !== undefined ? isReferral : existingApp.isReferral,
         referralName: referralName !== undefined ? referralName : existingApp.referralName,
+        resumeVersion: resumeVersion !== undefined ? resumeVersion : existingApp.resumeVersion,
+        coverLetterNotes: coverLetterNotes !== undefined ? coverLetterNotes : existingApp.coverLetterNotes,
         ...(status && status !== ApplicationStatus.WISHLIST && !existingApp.appliedAt ? { appliedAt: new Date() } : {}),
       },
       include: { job: true },

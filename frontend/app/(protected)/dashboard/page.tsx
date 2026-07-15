@@ -215,13 +215,54 @@ export default function DashboardPage() {
         )}
       </motion.header>
 
-      {/* ── Stat row ── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard delay={0.05} label="Total"       value={total}                          icon={Briefcase} />
-        <StatCard delay={0.10} label="Today"       value={stats?.todayApplications ?? 0}  icon={Clock}     sub="applications sent" />
-        <StatCard delay={0.15} label="This week"   value={stats?.weekApplications ?? 0}   icon={FileCheck} sub="7-day window" />
-        <StatCard delay={0.20} label="Active"      value={stats?.activePipeline ?? 0}     icon={Target}    sub="interviews & pending" highlight />
-      </div>
+      {/* ── Onboarding / Empty State ── */}
+      {total === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 md:p-12 text-center max-w-2xl mx-auto mt-12 shadow-sm"
+        >
+          <div className="h-16 w-16 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Target className="h-8 w-8 text-orange-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome to Careora</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">
+            Your personal job search tracker. Log applications, track interview rounds, and build a consistent daily habit.
+          </p>
+          
+          <div className="space-y-4 max-w-sm mx-auto text-left">
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+              <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white text-sm">Add your first job</p>
+                <p className="text-xs text-slate-500">Go to Pipeline and click Add Application.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+              <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold flex-shrink-0">2</div>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white text-sm">Set your daily goal</p>
+                <p className="text-xs text-slate-500">Configure your target in Settings.</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        <>
+          {/* ── Stat row ── */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard delay={0.05} label="Total"       value={total}                          icon={Briefcase} />
+            <StatCard 
+              delay={0.10} 
+              label="Today"       
+              value={stats?.todayApplications ?? 0}  
+              icon={Clock}     
+              sub={`/ ${stats?.dailyGoal ?? 5} goal`} 
+            />
+            <StatCard delay={0.15} label="This week"   value={stats?.weekApplications ?? 0}   icon={FileCheck} sub="7-day window" />
+            <StatCard delay={0.20} label="Active"      value={stats?.activePipeline ?? 0}     icon={Target}    sub="interviews & pending" highlight />
+          </div>
 
       {/* ── Heatmap ── */}
       <Card
@@ -415,6 +456,8 @@ export default function DashboardPage() {
           <LearningEditor />
         </motion.div>
       </div>
+      </>
+      )}
     </div>
   );
 }

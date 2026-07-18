@@ -22,7 +22,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/analytics", label: "Analytics", icon: BarChart2 },
   { href: "/jobs", label: "Job Pipeline", icon: Briefcase },
-  { href: "/learn", label: "Learning Journal", icon: BookOpen },
+  { href: "/learn", label: "Life Journal", icon: BookOpen },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

@@ -46,22 +46,71 @@ export const getYesterdayLearningEntry = async (req: Request, res: Response, nex
   }
 };
 
+export const getHeatmapData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const days = parseInt((req.query.days as string) || '180', 10);
+    const now = new Date();
+    const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - days + 1);
+
+    const entries = await prisma.learningEntry.findMany({
+      where: { userId, date: { gte: from } },
+      select: { date: true, dayRating: true, wakeUpTime: true, sleepTime: true, instaScreenTime: true },
+      orderBy: { date: 'asc' },
+    });
+
+    res.json(
+      entries.map((e) => ({
+        date: e.date.toISOString().split('T')[0],
+        rating: e.dayRating ?? null,
+        wakeUpTime: e.wakeUpTime ?? null,
+        sleepTime: e.sleepTime ?? null,
+        instaScreenTime: e.instaScreenTime ?? null,
+      }))
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const upsertLearningEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user!.id;
-    const { content, missed, date } = req.body;
+    const { content, missed, date, dayRating, wakeUpTime, sleepTime, instaScreenTime, daySummary } = req.body;
 
-    // content is non-nullable in the schema — default to empty string if omitted
-    const safeContent = (content ?? '').toString().trim();
-    const safeMissed  = (missed  ?? '').toString().trim();
+    const safeContent       = (content ?? '').toString().trim();
+    const safeMissed        = (missed  ?? '').toString().trim();
+    const safeDayRating     = dayRating    != null ? Math.max(1, Math.min(10, parseInt(dayRating, 10)))    : null;
+    const safeWakeUpTime    = wakeUpTime   ? wakeUpTime.toString().trim()   : null;
+    const safeSleepTime     = sleepTime    ? sleepTime.toString().trim()    : null;
+    const safeInstaScreen   = instaScreenTime != null ? Math.max(0, parseInt(instaScreenTime, 10))         : null;
+    const safeDaySummary    = daySummary   ? daySummary.toString().trim()   : null;
 
-    const dateObj  = date ? new Date(date) : new Date();
+    const dateObj    = date ? new Date(date) : new Date();
     const targetDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
 
     const entry = await prisma.learningEntry.upsert({
       where: { userId_date: { userId, date: targetDate } },
-      update: { content: safeContent, missed: safeMissed },
-      create: { userId, date: targetDate, content: safeContent, missed: safeMissed },
+      update: {
+        content: safeContent,
+        missed: safeMissed,
+        dayRating: safeDayRating,
+        wakeUpTime: safeWakeUpTime,
+        sleepTime: safeSleepTime,
+        instaScreenTime: safeInstaScreen,
+        daySummary: safeDaySummary,
+      },
+      create: {
+        userId,
+        date: targetDate,
+        content: safeContent,
+        missed: safeMissed,
+        dayRating: safeDayRating,
+        wakeUpTime: safeWakeUpTime,
+        sleepTime: safeSleepTime,
+        instaScreenTime: safeInstaScreen,
+        daySummary: safeDaySummary,
+      },
     });
     res.json(entry);
   } catch (error) {
